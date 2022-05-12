@@ -33,7 +33,7 @@ class NewtonMethod():
         hessian = np.array([[d1, d2],[d2, d3]])                                           
         return hessian
 
-    def newtons_method(self, x, y, tol = .0000000001, max_step = 15):                                                             
+    def fit(self, x, y, tol = .0000000001, epoch = 15):                                                             
         """
         :param x : Input Data
         :param y : Label
@@ -48,7 +48,7 @@ class NewtonMethod():
 
         # iter steps                                                                                                           
         iter = 0                                                                           
-        while abs(delta) > tol and iter < max_step:                                       
+        while abs(delta) > tol and iter < epoch:                                       
             iter += 1                                                                      
             grad = self.gradient(x, y, theta, intercept)                                                      
             hess = self.hessian(x, y, theta, intercept)                                                                                               
