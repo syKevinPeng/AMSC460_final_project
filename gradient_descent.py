@@ -33,7 +33,7 @@ class LogisticRegression():
         self.weights = self.weights - self.l_rate * error_w
         self.bias = self.bias - self.l_rate * error_b
 
-    def fit(self, x, y, epochs, verbose):
+    def fit(self, x, y, epochs, verbose, early_stop):
         self.weights = np.zeros(x.shape[1])
         self.bias = 0
         early_stop_tol = 1e-5
@@ -52,12 +52,13 @@ class LogisticRegression():
             self.losses.append(loss)
 
             if verbose: print(f'Epoch {i}: loss:{loss}; acc:{acc}\n')
-            # implement early stop
-            if len(early_stop_buffer) > 5:
-                early_stop_buffer.pop(0)
-            early_stop_buffer.append(acc)
-            if len(early_stop_buffer) == 5 and (max(early_stop_buffer) - min(early_stop_buffer) < early_stop_tol):
-                break # exit for loop
+            if early_stop:
+                # implement early stop
+                if len(early_stop_buffer) > 4:
+                    early_stop_buffer.pop(0)
+                early_stop_buffer.append(acc)
+                if len(early_stop_buffer) == 5 and (max(early_stop_buffer) - min(early_stop_buffer) < early_stop_tol):
+                    break # exit for loop
         return [self.weights, self.bias], [self.train_accuracies, self.losses]
     
     def test(self, test_x, test_y):
