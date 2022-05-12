@@ -4,7 +4,7 @@ Newton's Method Implementation
 
 import numpy as np
 
-# Defining sigmoid function
+# Defining sigmoid function specifically for newton's method
 def sigmoid(x, Θ_1, Θ_2):                                                        
     z = (Θ_1*x + Θ_2).astype("float_")                                              
     return 1.0 / (1.0 + np.exp(-z))      
