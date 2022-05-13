@@ -1,6 +1,7 @@
 '''
 Gradient Descent Method Implementation
 '''
+from matplotlib.pyplot import axis
 import numpy as np
 from sklearn.metrics import accuracy_score
 
@@ -33,6 +34,14 @@ class LogisticRegression():
         self.weights = self.weights - self.l_rate * error_w
         self.bias = self.bias - self.l_rate * error_b
 
+    def shuffle_dataset(self, x, y):
+        y = np.expand_dims(y, axis=1)
+        dataset = np.concatenate((x, y), axis = 1)
+        np.random.shuffle(dataset)
+        x = dataset[:, 0:-1]
+        y = dataset[:, -1]
+        return x,y
+
     def fit(self, x, y, epochs, verbose, early_stop):
         self.weights = np.zeros(x.shape[1])
         self.bias = 0
@@ -40,6 +49,8 @@ class LogisticRegression():
         early_stop_buffer = []
 
         for i in range(epochs):
+            x, y = self.shuffle_dataset(x, y)
+
             output = np.matmul(self.weights, x.transpose()) + self.bias
             pred = self.sigmoid(output)
             loss = self.binary_cross_entropy_loss(y, pred)

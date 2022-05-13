@@ -4,6 +4,7 @@ Newton's Method Implementation
 
 import numpy as np
 from sklearn.metrics import accuracy_score
+from random import shuffle
 
 class NewtonMethod():
     def __init__(self):
@@ -27,12 +28,22 @@ class NewtonMethod():
         y_one_loss = (1-y_true) * np.log(1 - y_pred + 1e-9)
         return -np.mean(y_zero_loss + y_one_loss)
 
+    def shuffle_dataset(self, x, y):
+        y = np.expand_dims(y, axis=1)
+        dataset = np.concatenate((x, y), axis = 1)
+        np.random.shuffle(dataset)
+        x = dataset[:, 0:-1]
+        y = dataset[:, -1]
+        return x,y
 
     def fit(self, x, y, epoch = 100, step_size = 0.01, verbose = False):
         params_num = x.shape[1]
         data_length = x.shape[0]
         self.weights = np.random.uniform(low=-0.5, high=0.5, size=params_num)                                                             
         for i in range(epoch):
+            # shuffle dataset
+            x, y = self.shuffle_dataset(x, y)
+
             sig_out = np.zeros(data_length)
             diff = np.zeros(data_length)
             gradient = np.zeros((params_num, 1))
