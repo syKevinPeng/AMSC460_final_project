@@ -9,7 +9,6 @@ DATASET_PATH = pathlib.Path("BankNote_Authentication.csv")
 def preprocess():
     data_headers = ['variance','skewness','kurtosis','entropy','class']
     dataset = pd.read_csv(DATASET_PATH)
-    print(dataset.head(10))
 
     x = dataset.drop(["class"],axis=1) # data
     y = dataset['class'] # label

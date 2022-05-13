@@ -14,7 +14,7 @@ class LogisticRegression():
     def sigmoid(self, x):
         return 1/(1 + np.exp(-x))
 
-    def compute_loss(self, y_true, y_pred):
+    def binary_cross_entropy_loss(self, y_true, y_pred):
         # binary cross entropy
         y_zero_loss = y_true * np.log(y_pred + 1e-9)
         y_one_loss = (1-y_true) * np.log(1 - y_pred + 1e-9)
@@ -42,7 +42,7 @@ class LogisticRegression():
         for i in range(epochs):
             output = np.matmul(self.weights, x.transpose()) + self.bias
             pred = self.sigmoid(output)
-            loss = self.compute_loss(y, pred)
+            loss = self.binary_cross_entropy_loss(y, pred)
             error_w, error_b = self.compute_gradients(x, y, pred)
             self.update_model_parameters(error_w, error_b)
 

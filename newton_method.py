@@ -3,66 +3,65 @@ Newton's Method Implementation
 '''
 
 import numpy as np
+from sklearn.metrics import accuracy_score
 
 class NewtonMethod():
     def __init__(self):
         self.losses = []
         self.train_accuracies = []
-
+        self.weights = None
+    
     # Defining sigmoid function specifically for newton's method
-    def sigmoid(self, x, Θ_1, Θ_2):                                                        
-        z = (Θ_1*x + Θ_2).astype("float_")                                              
-        return 1.0 / (1.0 + np.exp(-z))      
-
-    # Defining log likelihood function using sigmoid
-    def log_likelihood(self, x, y, Θ_1, Θ_2):                                                                
-        sigmoid_probs = self.sigmoid(x, Θ_1, Θ_2)                                        
-        return np.sum(y * np.log(sigmoid_probs) + (1 - y) * np.log(1 - sigmoid_probs)) 
-
-    # Defining gradient for the above function
-    def gradient(self, x, y, Θ_1, Θ_2):                                                         
-        sigmoid_probs = self.sigmoid(x, Θ_1, Θ_2)                                        
-        return np.array([[np.sum((y - sigmoid_probs) * x), np.sum((y - sigmoid_probs) * 1)]])       
-
+    def sigmoid(self, x):                                                                                                   
+        return 1.0 / (1.0 + np.exp(-x))      
+     
     # defining hessian matrix
-    def hessian(self, x, y, Θ_1, Θ_2):                                                          
-        sigmoid_probs = self.sigmoid(x, Θ_1, Θ_2)                                        
-        d1 = np.sum((sigmoid_probs * (1 - sigmoid_probs)) * x * x)                  
-        d2 = np.sum((sigmoid_probs * (1 - sigmoid_probs)) * x * 1)                  
-        d3 = np.sum((sigmoid_probs * (1 - sigmoid_probs)) * 1 * 1)                  
-        hessian = np.array([[d1, d2],[d2, d3]])                                           
-        return hessian
+    def hessian(self, sig_out, data):                                                          
+        sig_der = np.diag(np.multiply(sig_out, np.subtract(1, sig_out)))
+        hess = np.matmul(np.matmul(data,sig_der), np.transpose(data))                             
+        return hess
+    
+    def binary_cross_entropy_loss(self, y_true, y_pred):
+        # binary cross entropy
+        y_zero_loss = y_true * np.log(y_pred + 1e-9)
+        y_one_loss = (1-y_true) * np.log(1 - y_pred + 1e-9)
+        return -np.mean(y_zero_loss + y_one_loss)
 
-    def fit(self, x, y, tol = .0000000001, epoch = 15):                                                             
-        """
-        :param x : Input Data
-        :param y : Label
-        :returns: two logestic regression parameters
-        """
 
-        # Initialize parameters                                                                   
-        theta = 15.1                                                                     
-        intercept = -0.4                                                           
-        delta = 100 # initilize delta to a relateively large term                                                              
-        l = self.log_likelihood(x, y, theta, intercept)                                                                 
+    def fit(self, x, y, epoch = 100, step_size = 0.01, verbose = False):
+        params_num = x.shape[1]
+        data_length = x.shape[0]
+        self.weights = np.random.uniform(low=-0.5, high=0.5, size=params_num)                                                             
+        for i in range(epoch):
+            sig_out = np.zeros(data_length)
+            diff = np.zeros(data_length)
+            gradient = np.zeros((params_num, 1))
+            data = np.zeros((params_num, data_length))
+            # row iterator loop
+            for j in range(data_length):
+                sig_out[j] = self.sigmoid(np.dot(x[j], self.weights))
+                diff[j] = sig_out[j] - y[j]
+                data[:,j] = x[j].transpose()
+                gradient[:, 0] = gradient[:,0] + np.multiply(x[j].transpose(), diff[j])
 
-        # iter steps                                                                                                           
-        iter = 0                                                                           
-        while abs(delta) > tol and iter < epoch:                                       
-            iter += 1                                                                      
-            grad = self.gradient(x, y, theta, intercept)                                                      
-            hess = self.hessian(x, y, theta, intercept)                                                                                               
+            # compute Hessian
+            hess = self.hessian(sig_out, data)
+            inv_hess = np.linalg.inv(hess)
 
-            update_matrix = np.linalg.inv(hess)@grad.T                                                             
-            delta_1 = update_matrix[0][0]                                                              
-            delta_2 = update_matrix[1][0]                                                              
-                                                                                        
-            # Update parmeters                                                    
-            theta += delta_1                                                                 
-            intercept += delta_2                                                                 
-                                                                                        
-            # Update weights                                   
-            l_new = self.log_likelihood(x, y, theta, intercept)                                                      
-            delta = l - l_new                                                           
-            l = l_new                                                                
-        return np.array([theta, intercept]) 
+            # do the weight update
+            self.weights = self.weights  - step_size* np.squeeze(np.matmul(inv_hess, gradient))
+
+            pred = self.sigmoid(np.matmul(self.weights, x.transpose()))
+            loss = self.binary_cross_entropy_loss(y, pred) 
+            pred_to_class = [1 if p > 0.5 else 0 for p in pred]
+            acc = accuracy_score(y, pred_to_class)
+            self.losses.append(loss)
+            self.train_accuracies.append(acc)
+            if verbose: print(f'Epoch {i}: loss:{loss}; acc:{acc}\n')
+
+    def test(self, test_x, test_y):
+        output = np.matmul(self.weights, test_x.transpose()) 
+        pred = self.sigmoid(output)
+        pred_to_class = [1 if p > 0.5 else 0 for p in pred]
+        test_acc = accuracy_score(test_y, pred_to_class)
+        return test_acc

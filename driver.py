@@ -5,6 +5,7 @@ from newton_method import NewtonMethod
 
 def driver(mode, epoch_num):
     x_train, x_test, y_train, y_test = preprocess()
+    print(f'{x_train.shape}\n')
     if mode == "gd":
         gradient_descent = LogisticRegression(learning_rate = 0.1)
         gradient_descent.fit(x=x_train, y=y_train, epochs = epoch_num, verbose = True, early_stop=True)
@@ -12,7 +13,8 @@ def driver(mode, epoch_num):
         print(f'testing accuracy is: {test_acc}')
     elif mode == "newton":
         newton = NewtonMethod()
-        param = newton.fit(x=x_train, y=y_train, epoch = epoch_num)
+        y_train = y_train.to_numpy()
+        param = newton.fit(x=x_train, y=y_train, epoch = epoch_num, verbose = True)
         print(f'parameter: {param}')
     else:
         raise Exception(f'Incorrect mode name for driver. Got: {mode}')
