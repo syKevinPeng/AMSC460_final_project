@@ -70,7 +70,7 @@ class NewtonMethod():
             self.train_accuracies.append(acc)
             if verbose: print(f'Epoch {i}: loss:{loss}; acc:{acc}\n')
 
-            return [self.weights], [self.train_accuracies, self.losses]
+        return [self.weights], [self.train_accuracies, self.losses]
 
     def test(self, test_x, test_y):
         output = np.matmul(self.weights, test_x.transpose()) 
