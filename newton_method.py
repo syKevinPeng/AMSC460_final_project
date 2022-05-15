@@ -36,7 +36,7 @@ class NewtonMethod():
         y = dataset[:, -1]
         return x,y
 
-    def fit(self, x, y, epoch = 100, step_size = 0.01, verbose = False):
+    def fit(self, x, y, epoch = 100,  verbose = False):
         params_num = x.shape[1]
         data_length = x.shape[0]
         self.weights = np.random.uniform(low=-0.5, high=0.5, size=params_num)                                                             
@@ -60,7 +60,7 @@ class NewtonMethod():
             inv_hess = np.linalg.inv(hess)
 
             # do the weight update
-            self.weights = self.weights  - step_size* np.squeeze(np.matmul(inv_hess, gradient))
+            self.weights = self.weights  - np.squeeze(np.matmul(inv_hess, gradient))
 
             pred = self.sigmoid(np.matmul(self.weights, x.transpose()))
             loss = self.binary_cross_entropy_loss(y, pred) 

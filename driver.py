@@ -43,13 +43,13 @@ def driver(mode, epoch_num, dataset_name, verbose):
 
 if __name__ == "__main__":
     mode = "newton"
-    epoch_num = 100
+    epoch_num = 10
     dataset_name = "bank"
-    verbose = False
+    verbose = True
     driver(mode, epoch_num, dataset_name, verbose)
     
     mode = "gd"
-    epoch_num = 100
+    epoch_num = 10
     dataset_name = "bank"
     verbose = False
     driver(mode, epoch_num, dataset_name, verbose)
