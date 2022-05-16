@@ -13,9 +13,8 @@ class NewtonMethod():
         self.weights = None
     
     # Defining sigmoid function specifically for newton's method
-    def sigmoid(self, x):                                                                                                   
-        return 1.0 / (1.0 + np.exp(-x))      
-     
+    def sigmoid(self, x):                                                                                                
+        return 1.0 / (1.0 + np.exp(-x))    
     # defining hessian matrix
     def hessian(self, sig_out, data):                                                          
         sig_der = np.diag(np.multiply(sig_out, np.subtract(1, sig_out)))
@@ -35,6 +34,8 @@ class NewtonMethod():
         x = dataset[:, 0:-1]
         y = dataset[:, -1]
         return x,y
+    def is_invertible(self, a):
+        return a.shape[0] == a.shape[1] and np.linalg.matrix_rank(a) == a.shape[0]
 
     def fit(self, x, y, epoch = 100,  verbose = False):
         params_num = x.shape[1]
@@ -57,6 +58,9 @@ class NewtonMethod():
 
             # compute Hessian
             hess = self.hessian(sig_out, data)
+            # add pertubation
+            # hess = hess + 50*np.identity(len(hess))
+            hess = hess + 80*np.identity(len(hess))
             inv_hess = np.linalg.inv(hess)
 
             # do the weight update

@@ -13,6 +13,7 @@ class LogisticRegression():
 
     # define sigmoid function for gradient descent method
     def sigmoid(self, x):
+        x = np.clip(x,-1e3, 1e3)
         return 1/(1 + np.exp(-x))
 
     def binary_cross_entropy_loss(self, y_true, y_pred):

@@ -32,7 +32,7 @@ def preprocess(dataset_dir_path, dataset_name):
         x = dataset.drop(["spam"],axis=1)
         # standardiz data
         scaler = StandardScaler()
-        dataset = scaler.fit_transform(dataset)
+        x = scaler.fit_transform(x)
     else:
         raise Exception("Dataset name has to be one of [bank, email]")
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.2, random_state = 42)
